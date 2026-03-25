@@ -20,9 +20,7 @@ function AppContent() {
 
   return (
     <View style={styles.container}>
-      <SafeAreaProvider>
       <AppNavigator />
-    </SafeAreaProvider>
     </View>
   );
 }
