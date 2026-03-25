@@ -8,10 +8,10 @@ import {
   View,
 } from 'react-native';
 import { PostCard } from '../components/PostCard';
-import { useAuth } from '../features/auth/hooks';
-import { usePosts } from '../features/posts/hooks';
-import { RootStackParamList } from '../navigation/AppNavigator';
-import { Button } from '../shared/components/Button';
+import { useAuth } from '../../auth/hooks';
+import { usePosts } from '../hooks';
+import { RootStackParamList } from '../../../navigation/AppNavigator';
+import { Button } from '../../../shared/components/Button';
 
 export const PostsListScreen: React.FC = () => {
   const { posts, loading, error, refetch } = usePosts();

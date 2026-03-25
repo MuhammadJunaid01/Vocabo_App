@@ -4,6 +4,7 @@ import {
   SafeAreaProvider,
 } from 'react-native-safe-area-context';
 import { AppNavigator } from './src/navigation/AppNavigator';
+import { ErrorBoundary } from './src/shared/components/ErrorBoundary';
 
 function App() {
   const isDarkMode = useColorScheme() === 'dark';
@@ -11,7 +12,9 @@ function App() {
   return (
     <SafeAreaProvider>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <AppContent />
+      <ErrorBoundary>
+        <AppContent />
+      </ErrorBoundary>
     </SafeAreaProvider>
   );
 }

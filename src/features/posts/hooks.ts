@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { storage } from '../../core/utils/storage';
 import { Comment, Post } from '../../core/types';
 import { fetchComments, fetchPosts } from './api';
 
@@ -12,25 +13,43 @@ export const usePosts = () => {
 
   const loadPosts = useCallback(async (forceRefresh = false) => {
     const now = Date.now();
+    
+    // 1. Try to load from memory cache
     if (!forceRefresh && now - lastFetch.current < CACHE_DURATION && posts.length > 0) {
-      return; // Use cache
+      return;
     }
 
     setLoading(true);
     setError(null);
     try {
+      // 2. Try to fetch from API
       const data = await fetchPosts();
       setPosts(data);
       lastFetch.current = now;
+      // 3. Save to offline storage
+      await storage.setItem(storage.KEYS.POSTS, data);
     } catch (err: any) {
-      setError(err?.message || 'Failed to load posts');
+      // 4. If fetch fails, try to load from offline storage
+      const cachedData = await storage.getItem(storage.KEYS.POSTS);
+      if (cachedData) {
+        setPosts(cachedData);
+        setError('Working offline. Data may be outdated.');
+      } else {
+        setError(err?.message || 'Failed to load posts');
+      }
     } finally {
       setLoading(false);
     }
   }, [posts.length]);
 
   useEffect(() => {
-    loadPosts();
+    // Initial load attempt from storage first for snappy UX
+    const init = async () => {
+      const cachedData = await storage.getItem(storage.KEYS.POSTS);
+      if (cachedData) setPosts(cachedData);
+      loadPosts();
+    };
+    init();
   }, []);
 
   const refetch = useCallback(() => loadPosts(true), [loadPosts]);

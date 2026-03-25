@@ -7,9 +7,9 @@ import {
     TextInput,
     View,
 } from 'react-native';
-import { usePost } from '../features/posts/hooks';
-import { Button } from '../shared/components/Button';
-import { Card } from '../shared/components/Card';
+import { usePost } from '../hooks';
+import { Button } from '../../../shared/components/Button';
+import { Card } from '../../../shared/components/Card';
 
 export const PostDetailScreen: React.FC = () => {
   const route = useRoute();

@@ -7,9 +7,9 @@ import {
     Text,
     View,
 } from 'react-native';
-import { useAuth } from '../features/auth/hooks';
-import { Button } from '../shared/components/Button';
-import { Input } from '../shared/components/Input';
+import { useAuth } from '../hooks';
+import { Button } from '../../../shared/components/Button';
+import { Input } from '../../../shared/components/Input';
 
 
 export const LoginScreen: React.FC = () => {

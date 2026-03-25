@@ -1,97 +1,70 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# React Native Technical Task - Vocabo App
 
-# Getting Started
+This project is a React Native mobile application built as part of a technical evaluation. It demonstrates a clean, feature-based modular architecture, reusable components, and smart abstractions for Firebase and API integration.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+## 🚀 Objective
+Build a robust mobile app using Firebase that follows best practices in software architecture and code quality.
 
-## Step 1: Start Metro
+## 🛠 Tech Stack
+- **Framework**: React Native (TypeScript)
+- **State Management**: React Hooks & Custom Hooks
+- **Authentication**: Firebase (Email/Password, Google Sign-In)
+- **Database**: Firestore (Configured)
+- **API**: JSONPlaceholder
+- **Storage**: AsyncStorage (for offline caching)
+- **Navigation**: React Navigation (Stack)
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+## 🧱 Architecture
+The app follows a **Feature-based Modular Architecture**:
+- `src/core/`: Global configurations, types, and universal utilities.
+- `src/features/`: Independent modules (Auth, Posts) containing their own API logic, hooks, and screens.
+- `src/shared/`: Reusable UI components (Button, Input, Card) and global layouts.
+- `src/navigation/`: App-wide navigation logic.
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+### 🔁 Smart Abstractions
+- `useAuth`: Centralized authentication logic abstracting Firebase.
+- `usePosts`: Data fetching hook with built-in **Offline Caching** and memory-based caching (5-minute TTL).
+- `storage`: Utility wrapper for `AsyncStorage`.
 
-```sh
-# Using npm
-npm start
+## ✨ Features
+- [x] **Email & Password Auth**: Secure login via Firebase.
+- [x] **Google Sign-In**: Integrated social login.
+- [x] **Post List**: Scrollable list with Pull-to-Refresh.
+- [x] **Post Detail**: Detailed view with likes and comments interaction.
+- [x] **Offline Support**: Posts are cached locally for viewing without internet access.
+- [x] **Error Boundary**: Robust handling of unexpected application errors.
 
-# OR using Yarn
-yarn start
-```
+## 📦 Setup & Installation
 
-## Step 2: Build and run your app
+1. **Clone the repository**:
+   ```bash
+   git clone <repo-url>
+   cd TECHNICAL_TASK
+   ```
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+2. **Install dependencies**:
+   ```bash
+   yarn install
+   ```
 
-### Android
+3. **Node Version**:
+   This project requires Node.js `^20.19.0 || ^22.13.0 || >=24`. Use the included `.nvmrc`:
+   ```bash
+   nvm use
+   ```
 
-```sh
-# Using npm
-npm run android
+4. **Android Setup**:
+   - Ensure `google-services.json` is in `android/app/`.
+   - Run `yarn android`.
 
-# OR using Yarn
-yarn android
-```
+5. **iOS Setup**:
+   - `cd ios && pod install && cd ..`
+   - Run `yarn ios`.
 
-### iOS
-
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
-```
-
-Then, and every time you update your native dependencies, run:
-
-```sh
-bundle exec pod install
-```
-
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
-
-```sh
-# Using npm
-npm run ios
-
-# OR using Yarn
-yarn ios
-```
-
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
-
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
-
-## Step 3: Modify your app
-
-Now that you have successfully run the app, let's make changes!
-
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
-
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
-
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+## 🧠 Development Flow
+The development followed a strict git workflow with clear, atomic commits focusing on:
+1. Environment stability (Node versioning).
+2. Infrastructure setup (Navigation, Firebase).
+3. Component-driven development.
+4. Logic abstraction via Hooks.
+5. Robustness & Bonus features (Caching, Error Boundaries).
