@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity } from 'react-native';
-import { Post } from '../core/types';
-import { Card } from '../shared/components/Card';
+import { Post } from '../../../core/types';
+import { Card } from '../../../shared/components/Card';
 
 interface PostCardProps {
   post: Post;
