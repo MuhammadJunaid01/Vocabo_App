@@ -20,7 +20,7 @@ export const AppNavigator: React.FC = () => {
 
   useEffect(() => {
     GoogleSignin.configure({
-      webClientId: 'YOUR_WEB_CLIENT_ID', // Replace with your web client ID from Firebase console
+      webClientId: '64767710256-jk54ieluniei0l78jtvs9745trvevr9q.apps.googleusercontent.com',
     });
   }, []);
 
