@@ -1,22 +1,22 @@
-// src/features/posts/screens/PostsListScreen.tsx
-import { useNavigation } from '@react-navigation/native';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
 import React from 'react';
 import {
-    FlatList,
-    RefreshControl,
-    StyleSheet,
-    Text,
-    View,
+  FlatList,
+  RefreshControl,
+  StyleSheet,
+  Text,
+  View,
 } from 'react-native';
 import { PostCard } from '../components/PostCard';
 import { useAuth } from '../features/auth/hooks';
 import { usePosts } from '../features/posts/hooks';
+import { RootStackParamList } from '../navigation/AppNavigator';
 import { Button } from '../shared/components/Button';
 
 export const PostsListScreen: React.FC = () => {
   const { posts, loading, error, refetch } = usePosts();
   const { logout } = useAuth();
-  const navigation = useNavigation<any>();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   const handlePress = (postId: number) => {
     navigation.navigate('PostDetail', { postId });
