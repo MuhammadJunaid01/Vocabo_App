@@ -1,15 +1,67 @@
 import React, { useState } from 'react';
 import {
+  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
+  TouchableOpacity,
   View,
 } from 'react-native';
 import { useAuth } from '../hooks';
-import { Button } from '../../../shared/components/Button';
-import { Input } from '../../../shared/components/Input';
+
+// ─── Sub-components ────────────────────────────────────────────────────────────
+
+const AuthInput: React.FC<{
+  label: string;
+  placeholder: string;
+  value: string;
+  onChangeText: (t: string) => void;
+  secureTextEntry?: boolean;
+  keyboardType?: any;
+  autoCapitalize?: any;
+}> = ({ label, placeholder, value, onChangeText, secureTextEntry, keyboardType, autoCapitalize }) => (
+  <View style={inputStyles.wrapper}>
+    <Text style={inputStyles.label}>{label}</Text>
+    <TextInput
+      style={inputStyles.field}
+      placeholder={placeholder}
+      placeholderTextColor="#9CA3AF"
+      value={value}
+      onChangeText={onChangeText}
+      secureTextEntry={secureTextEntry}
+      keyboardType={keyboardType}
+      autoCapitalize={autoCapitalize ?? 'none'}
+    />
+  </View>
+);
+
+const inputStyles = StyleSheet.create({
+  wrapper: { marginBottom: 18 },
+  label: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#374151',
+    marginBottom: 8,
+    letterSpacing: 0.4,
+    textTransform: 'uppercase',
+  },
+  field: {
+    backgroundColor: '#F9FAFB',
+    borderWidth: 1.5,
+    borderColor: '#E5E7EB',
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    fontSize: 16,
+    color: '#111827',
+  },
+});
+
+// ─── Main Screen ───────────────────────────────────────────────────────────────
 
 export const LoginScreen: React.FC = () => {
   const { login, register, googleLogin, loading, error, clearError } = useAuth();
@@ -17,80 +69,116 @@ export const LoginScreen: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  const switchMode = (toLogin: boolean) => {
+    clearError();
+    setIsLogin(toLogin);
+    setEmail('');
+    setPassword('');
+  };
+
   const handleSubmit = () => {
     clearError();
-    const authFn = isLogin ? login : register;
-    authFn(email, password);
+    (isLogin ? login : register)(email, password);
   };
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}
-    >
-      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-        {/* Header */}
-        <View style={styles.header}>
-          <View style={styles.logoContainer}>
+      style={styles.root}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+      <ScrollView
+        contentContainerStyle={styles.scroll}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}>
+
+        {/* ── Hero ─────────────────────────────────────────────────────── */}
+        <View style={styles.hero}>
+          <View style={styles.logoRing}>
             <Text style={styles.logoEmoji}>📚</Text>
           </View>
-          <Text style={styles.appName}>Vocabo</Text>
-          <Text style={styles.tagline}>Your personal reading hub</Text>
+          <Text style={styles.brand}>Vocabo</Text>
+          <Text style={styles.heroSub}>Your personal reading hub</Text>
         </View>
 
-        {/* Form Card */}
+        {/* ── Card ─────────────────────────────────────────────────────── */}
         <View style={styles.card}>
-          <Text style={styles.formTitle}>{isLogin ? 'Welcome back' : 'Create account'}</Text>
-          <Text style={styles.formSubtitle}>
-            {isLogin ? 'Sign in to continue' : 'Fill in to get started'}
-          </Text>
 
-          <Input
+          {/* Tab switcher */}
+          <View style={styles.tabBar}>
+            <Pressable
+              style={[styles.tab, isLogin && styles.tabActive]}
+              onPress={() => switchMode(true)}>
+              <Text style={[styles.tabText, isLogin && styles.tabTextActive]}>Sign In</Text>
+            </Pressable>
+            <Pressable
+              style={[styles.tab, !isLogin && styles.tabActive]}
+              onPress={() => switchMode(false)}>
+              <Text style={[styles.tabText, !isLogin && styles.tabTextActive]}>Register</Text>
+            </Pressable>
+          </View>
+
+          {/* Inputs */}
+          <AuthInput
             label="Email"
-            placeholder="Enter your email"
+            placeholder="you@example.com"
             value={email}
             onChangeText={setEmail}
             keyboardType="email-address"
-            autoCapitalize="none"
           />
-
-          <Input
+          <AuthInput
             label="Password"
-            placeholder="Enter your password"
+            placeholder="••••••••"
             value={password}
             onChangeText={setPassword}
             secureTextEntry
           />
 
-          {error && <Text style={styles.error}>{error}</Text>}
+          {/* Error */}
+          {error ? (
+            <View style={styles.errorBox}>
+              <Text style={styles.errorText}>⚠️  {error}</Text>
+            </View>
+          ) : null}
 
-          <Button
-            title={isLogin ? 'Sign In' : 'Create Account'}
+          {/* Primary CTA */}
+          <TouchableOpacity
+            style={[styles.primaryBtn, loading && styles.primaryBtnDisabled]}
             onPress={handleSubmit}
-            loading={loading}
-          />
+            disabled={loading}
+            activeOpacity={0.85}>
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.primaryBtnText}>
+                {isLogin ? 'Sign In' : 'Create Account'}
+              </Text>
+            )}
+          </TouchableOpacity>
 
+          {/* Divider */}
           <View style={styles.divider}>
-            <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>or</Text>
-            <View style={styles.dividerLine} />
+            <View style={styles.divLine} />
+            <Text style={styles.divText}>or continue with</Text>
+            <View style={styles.divLine} />
           </View>
 
-          <Button
-            title="🔵  Continue with Google"
-            variant="secondary"
+          {/* Google */}
+          <TouchableOpacity
+            style={styles.googleBtn}
             onPress={googleLogin}
-            loading={loading}
-          />
+            disabled={loading}
+            activeOpacity={0.85}>
+            <Text style={styles.googleIcon}>G</Text>
+            <Text style={styles.googleText}>Google</Text>
+          </TouchableOpacity>
         </View>
 
-        {/* Switch Auth Mode */}
-        <View style={styles.switchRow}>
-          <Text style={styles.switchText}>
-            {isLogin ? "Don't have an account?" : 'Already have an account?'}
+        {/* ── Footer ───────────────────────────────────────────────────── */}
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>
+            {isLogin ? "Don't have an account? " : 'Already have an account? '}
           </Text>
-          <Text style={styles.switchLink} onPress={() => { clearError(); setIsLogin(!isLogin); }}>
-            {isLogin ? ' Sign Up' : ' Sign In'}
+          <Text style={styles.footerLink} onPress={() => switchMode(!isLogin)}>
+            {isLogin ? 'Register' : 'Sign In'}
           </Text>
         </View>
       </ScrollView>
@@ -98,106 +186,195 @@ export const LoginScreen: React.FC = () => {
   );
 };
 
+// ─── Styles ────────────────────────────────────────────────────────────────────
+const BLUE = '#2563EB';
+const BLUE_LIGHT = '#EFF6FF';
+
 const styles = StyleSheet.create({
-  container: {
+  root: {
     flex: 1,
-    backgroundColor: '#F2F2F7',
+    backgroundColor: '#F3F4F6',
   },
-  content: {
+  scroll: {
     flexGrow: 1,
-    padding: 24,
-    paddingTop: 60,
+    paddingHorizontal: 20,
+    paddingTop: 64,
+    paddingBottom: 40,
   },
-  header: {
+
+  // ── Hero ──────────────────────────────────────────────────────────────
+  hero: {
     alignItems: 'center',
-    marginBottom: 36,
+    marginBottom: 32,
   },
-  logoContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 24,
-    backgroundColor: '#007AFF',
+  logoRing: {
+    width: 88,
+    height: 88,
+    borderRadius: 26,
+    backgroundColor: BLUE,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 16,
-    shadowColor: '#007AFF',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.4,
-    shadowRadius: 16,
-    elevation: 8,
+    marginBottom: 18,
+    shadowColor: BLUE,
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.45,
+    shadowRadius: 20,
+    elevation: 10,
   },
-  logoEmoji: {
-    fontSize: 36,
-  },
-  appName: {
-    fontSize: 32,
+  logoEmoji: { fontSize: 40 },
+  brand: {
+    fontSize: 34,
     fontWeight: '800',
-    color: '#1C1C1E',
-    letterSpacing: -0.5,
+    color: '#111827',
+    letterSpacing: -1,
   },
-  tagline: {
+  heroSub: {
     fontSize: 15,
-    color: '#8E8E93',
+    color: '#6B7280',
     marginTop: 4,
   },
+
+  // ── Card ──────────────────────────────────────────────────────────────
   card: {
     backgroundColor: '#fff',
-    borderRadius: 24,
+    borderRadius: 28,
     padding: 24,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.07,
+    shadowRadius: 28,
+    elevation: 8,
+  },
+
+  // Tab switcher
+  tabBar: {
+    flexDirection: 'row',
+    backgroundColor: '#F3F4F6',
+    borderRadius: 14,
+    padding: 4,
+    marginBottom: 28,
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: 10,
+    borderRadius: 11,
+    alignItems: 'center',
+  },
+  tabActive: {
+    backgroundColor: '#fff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
-    shadowRadius: 24,
-    elevation: 6,
+    shadowRadius: 6,
+    elevation: 3,
   },
-  formTitle: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#1C1C1E',
-    marginBottom: 4,
-  },
-  formSubtitle: {
+  tabText: {
     fontSize: 15,
-    color: '#8E8E93',
-    marginBottom: 24,
+    fontWeight: '600',
+    color: '#9CA3AF',
   },
-  error: {
-    color: '#FF3B30',
+  tabTextActive: {
+    color: '#111827',
+  },
+
+  // Error
+  errorBox: {
+    backgroundColor: '#FEF2F2',
+    borderRadius: 12,
+    padding: 12,
     marginBottom: 16,
-    textAlign: 'center',
+    borderLeftWidth: 3,
+    borderLeftColor: '#EF4444',
+  },
+  errorText: {
+    color: '#B91C1C',
     fontSize: 14,
     fontWeight: '500',
-    backgroundColor: '#FFF5F5',
-    padding: 12,
-    borderRadius: 10,
   },
+
+  // Primary button
+  primaryBtn: {
+    backgroundColor: BLUE,
+    borderRadius: 16,
+    paddingVertical: 16,
+    alignItems: 'center',
+    marginTop: 4,
+    shadowColor: BLUE,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.4,
+    shadowRadius: 14,
+    elevation: 6,
+  },
+  primaryBtnDisabled: {
+    opacity: 0.7,
+  },
+  primaryBtnText: {
+    color: '#fff',
+    fontSize: 17,
+    fontWeight: '700',
+    letterSpacing: 0.3,
+  },
+
+  // Divider
   divider: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 8,
+    marginVertical: 20,
   },
-  dividerLine: {
+  divLine: {
     flex: 1,
     height: 1,
-    backgroundColor: '#E5E5EA',
+    backgroundColor: '#E5E7EB',
   },
-  dividerText: {
+  divText: {
     marginHorizontal: 12,
-    color: '#8E8E93',
-    fontSize: 14,
+    fontSize: 13,
+    color: '#9CA3AF',
+    fontWeight: '500',
   },
-  switchRow: {
+
+  // Google button
+  googleBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    paddingVertical: 14,
+    borderWidth: 1.5,
+    borderColor: '#E5E7EB',
+    gap: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  googleIcon: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#4285F4',
+    fontStyle: 'italic',
+  },
+  googleText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#374151',
+  },
+
+  // Footer
+  footer: {
     flexDirection: 'row',
     justifyContent: 'center',
     marginTop: 24,
   },
-  switchText: {
-    color: '#8E8E93',
+  footerText: {
     fontSize: 15,
+    color: '#6B7280',
   },
-  switchLink: {
-    color: '#007AFF',
+  footerLink: {
     fontSize: 15,
-    fontWeight: '600',
+    fontWeight: '700',
+    color: BLUE,
   },
 });
