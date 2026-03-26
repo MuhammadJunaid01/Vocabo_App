@@ -30,8 +30,8 @@ Follow these steps to run the project locally.
 
 1. **Clone the repository**:
    ```bash
-   git clone <repo-url>
-   cd TECHNICAL_TASK
+   git clone https://github.com/MuhammadJunaid01/Vocabo_App.git
+   cd Vocabo_App
    ```
 
 2. **Configure Environment Variables**:
