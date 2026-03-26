@@ -10,7 +10,7 @@ interface PostCardProps {
 
 export const PostCard: React.FC<PostCardProps> = ({ post, onPress }) => {
   return (
-    <TouchableOpacity onPress={onPress}>
+    <TouchableOpacity activeOpacity={0.8} onPress={onPress}>
       <Card style={styles.card}>
         <Text style={styles.title} numberOfLines={2}>
           {post.title}
