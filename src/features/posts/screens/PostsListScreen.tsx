@@ -24,12 +24,7 @@ export const PostsListScreen: React.FC = () => {
     navigation.navigate('PostDetail', { postId });
   };
 
-  const renderHeader = useCallback(() => (
-    <View style={[styles.listHeader]}>
-      <Text style={styles.listHeaderText}>Latest Posts</Text>
-      <Text style={styles.listSubheader}>{posts.length} articles</Text>
-    </View>
-  ), [posts.length]);
+
 
   if (error && posts.length === 0) {
     return (
@@ -87,7 +82,7 @@ export const PostsListScreen: React.FC = () => {
           )}
           refreshControl={<RefreshControl refreshing={loading} onRefresh={refetch} tintColor="#007AFF" />}
           contentContainerStyle={styles.list}
-          ListHeaderComponent={renderHeader}
+          // ListHeaderComponent={renderHeader}
           showsVerticalScrollIndicator={false}
         />
       )}
