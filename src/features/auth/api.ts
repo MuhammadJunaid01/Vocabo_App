@@ -23,11 +23,16 @@ export const registerWithEmail = async (email: string, password: string): Promis
 
 // Google Sign-In
 export const loginWithGoogle = async (): Promise<User> => {
-  await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+  try {
+    await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
   const { idToken }: any = await GoogleSignin.signIn();
   const googleCredential = auth.GoogleAuthProvider.credential(idToken);
   const { user } = await auth().signInWithCredential(googleCredential);
   return mapFirebaseUser(user);
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
 };
 
 // Logout

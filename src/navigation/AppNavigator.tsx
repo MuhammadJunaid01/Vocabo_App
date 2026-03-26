@@ -20,7 +20,7 @@ export const AppNavigator: React.FC = () => {
 
   useEffect(() => {
     GoogleSignin.configure({
-      webClientId: '64767710256-jk54ieluniei0l78jtvs9745trvevr9q.apps.googleusercontent.com',
+      webClientId: '623836619468-4rjp4ssk6nsn77msstom12u0c40ne3gv.apps.googleusercontent.com'
     });
   }, []);
 

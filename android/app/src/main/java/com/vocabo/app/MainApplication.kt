@@ -1,4 +1,4 @@
-package com.technical_task
+package com.vocabo.app
 
 import android.app.Application
 import com.facebook.react.PackageList

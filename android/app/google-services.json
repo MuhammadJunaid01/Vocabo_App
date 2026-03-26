@@ -1,41 +1,41 @@
 {
   "project_info": {
-    "project_number": "64767710256",
-    "project_id": "task-a4bd5",
-    "storage_bucket": "task-a4bd5.firebasestorage.app"
+    "project_number": "623836619468",
+    "project_id": "task-739b1",
+    "storage_bucket": "task-739b1.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:64767710256:android:015acc84debfb312a109f5",
+        "mobilesdk_app_id": "1:623836619468:android:17e26298cdb6389b05d869",
         "android_client_info": {
-          "package_name": "com.technical_task"
+          "package_name": "com.vocabo.app"
         }
       },
       "oauth_client": [
         {
-          "client_id": "64767710256-j7bi9vnh47090q641am6ue4chu22a84s.apps.googleusercontent.com",
+          "client_id": "623836619468-4t8e3b3jsbqos5u8bm6pl2ummciucjda.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.technical_task",
+            "package_name": "com.vocabo.app",
             "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
           }
         },
         {
-          "client_id": "64767710256-jk54ieluniei0l78jtvs9745trvevr9q.apps.googleusercontent.com",
+          "client_id": "623836619468-4rjp4ssk6nsn77msstom12u0c40ne3gv.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBM60QHmoAdpTv_J8UvXbZCSatswy1NDDs"
+          "current_key": "AIzaSyAAofd72TdBWBWLOinxZBrvZLPl1d6qcp4"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "64767710256-jk54ieluniei0l78jtvs9745trvevr9q.apps.googleusercontent.com",
+              "client_id": "623836619468-4rjp4ssk6nsn77msstom12u0c40ne3gv.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
