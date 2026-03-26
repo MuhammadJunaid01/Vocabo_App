@@ -1,5 +1,5 @@
 import { NavigationProp, useNavigation } from '@react-navigation/native';
-import React from 'react';
+import React, { useCallback } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -9,26 +9,27 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { PostCard } from '../components/PostCard';
-import { useAuth } from '../../auth/hooks';
-import { usePosts } from '../hooks';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { RootStackParamList } from '../../../navigation/AppNavigator';
+import { useAuth } from '../../auth/hooks';
+import { PostCard } from '../components/PostCard';
+import { usePosts } from '../hooks';
 
 export const PostsListScreen: React.FC = () => {
   const { posts, loading, error, refetch } = usePosts();
   const { logout, user } = useAuth();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-
+  const insets = useSafeAreaInsets();
   const handlePress = (postId: number) => {
     navigation.navigate('PostDetail', { postId });
   };
 
-  const renderHeader = () => (
-    <View style={styles.listHeader}>
+  const renderHeader = useCallback(() => (
+    <View style={[styles.listHeader]}>
       <Text style={styles.listHeaderText}>Latest Posts</Text>
       <Text style={styles.listSubheader}>{posts.length} articles</Text>
     </View>
-  );
+  ), [posts.length]);
 
   if (error && posts.length === 0) {
     return (
@@ -54,7 +55,7 @@ export const PostsListScreen: React.FC = () => {
   return (
     <View style={styles.container}>
       {/* App Header */}
-      <View style={styles.appHeader}>
+      <View style={[styles.appHeader, { paddingTop: insets.top + 20 }]}>
         <View>
           <Text style={styles.appTitle}>📚 Vocabo</Text>
           {user?.displayName && (
