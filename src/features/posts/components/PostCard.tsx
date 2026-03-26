@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Post } from '../../../core/types';
 import { Card } from '../../../shared/components/Card';
 
@@ -10,17 +10,23 @@ interface PostCardProps {
 
 export const PostCard: React.FC<PostCardProps> = ({ post, onPress }) => {
   return (
-    <TouchableOpacity activeOpacity={0.8} onPress={onPress}>
+    <TouchableOpacity activeOpacity={0.75} onPress={onPress}>
       <Card style={styles.card}>
         <Text style={styles.title} numberOfLines={2}>
           {post.title}
         </Text>
-        <Text style={styles.body} numberOfLines={3}>
+        <Text style={styles.body} numberOfLines={2}>
           {post.body}
         </Text>
-        <Text style={styles.meta}>
-          ♥ {post.likes}    💬 {post.comments.length}
-        </Text>
+        <View style={styles.footer}>
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>♥ {post.likes}</Text>
+          </View>
+          <View style={[styles.badge, styles.commentBadge]}>
+            <Text style={styles.commentBadgeText}>💬 {post.comments.length}</Text>
+          </View>
+          <Text style={styles.readMore}>Read more →</Text>
+        </View>
       </Card>
     </TouchableOpacity>
   );
@@ -28,20 +34,50 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onPress }) => {
 
 const styles = StyleSheet.create({
   card: {
-    marginBottom: 12,
+    marginBottom: 16,
   },
   title: {
-    fontSize: 18,
-    fontWeight: '600',
+    fontSize: 17,
+    fontWeight: '700',
     marginBottom: 8,
+    color: '#1C1C1E',
+    letterSpacing: -0.2,
+    lineHeight: 24,
   },
   body: {
     fontSize: 14,
-    color: '#666',
-    marginBottom: 8,
+    color: '#6C6C70',
+    marginBottom: 16,
+    lineHeight: 20,
   },
-  meta: {
-    fontSize: 14,
-    color: '#999',
+  footer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  badge: {
+    backgroundColor: '#FFE5E5',
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  badgeText: {
+    color: '#FF3B30',
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  commentBadge: {
+    backgroundColor: '#E5F3FF',
+  },
+  commentBadgeText: {
+    color: '#007AFF',
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  readMore: {
+    marginLeft: 'auto',
+    color: '#007AFF',
+    fontSize: 13,
+    fontWeight: '600',
   },
 });

@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, TextInput, TextInputProps, View } from 'react-native';
 
-interface InputProps  extends TextInputProps {
+interface InputProps extends TextInputProps {
   label?: string;
   value: string;
   onChangeText: (text: string) => void;
@@ -22,6 +22,7 @@ export const Input: React.FC<InputProps> = ({
         value={value}
         onChangeText={onChangeText}
         style={[styles.input, error && styles.inputError]}
+        placeholderTextColor="#AEAEB2"
         {...props}
       />
       {error && <Text style={styles.errorText}>{error}</Text>}
@@ -31,29 +32,34 @@ export const Input: React.FC<InputProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 16,
+    marginBottom: 20,
   },
   label: {
     fontSize: 14,
-    fontWeight: '500',
-    marginBottom: 6,
-    color: '#333',
+    fontWeight: '600',
+    marginBottom: 8,
+    color: '#1C1C1E',
+    letterSpacing: 0.3,
   },
   input: {
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: '#E5E5EA',
-    borderRadius: 8,
-    paddingVertical: 12,
+    borderRadius: 12,
+    paddingVertical: 14,
     paddingHorizontal: 16,
     fontSize: 16,
-    backgroundColor: '#F2F2F7',
+    backgroundColor: '#F9F9F9',
+    color: '#1C1C1E',
   },
   inputError: {
     borderColor: '#FF3B30',
+    backgroundColor: '#FFF9F9',
   },
   errorText: {
     color: '#FF3B30',
-    fontSize: 12,
-    marginTop: 4,
+    fontSize: 13,
+    fontWeight: '500',
+    marginTop: 6,
+    marginLeft: 4,
   },
 });

@@ -1,14 +1,15 @@
 import { useRoute } from '@react-navigation/native';
 import React, { useState } from 'react';
 import {
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    View,
+  ActivityIndicator,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { usePost } from '../hooks';
-import { Button } from '../../../shared/components/Button';
 import { Card } from '../../../shared/components/Card';
 
 export const PostDetailScreen: React.FC = () => {
@@ -20,7 +21,8 @@ export const PostDetailScreen: React.FC = () => {
   if (loading) {
     return (
       <View style={styles.center}>
-        <Text>Loading...</Text>
+        <ActivityIndicator size="large" color="#007AFF" />
+        <Text style={styles.loadingText}>Loading post…</Text>
       </View>
     );
   }
@@ -28,8 +30,11 @@ export const PostDetailScreen: React.FC = () => {
   if (error || !post) {
     return (
       <View style={styles.center}>
-        <Text style={styles.error}>{error || 'Post not found'}</Text>
-        <Button title="Retry" onPress={refetch} />
+        <Text style={styles.errorEmoji}>⚠️</Text>
+        <Text style={styles.errorTitle}>{error || 'Post not found'}</Text>
+        <TouchableOpacity style={styles.retryBtn} onPress={refetch}>
+          <Text style={styles.retryText}>Retry</Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -37,7 +42,7 @@ export const PostDetailScreen: React.FC = () => {
   const handleAddComment = () => {
     if (!commentText.trim()) return;
     addComment({
-      name: 'Anonymous',
+      name: 'You',
       email: 'anon@example.com',
       body: commentText.trim(),
     });
@@ -45,44 +50,58 @@ export const PostDetailScreen: React.FC = () => {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      {/* Post Content */}
       <Card style={styles.postCard}>
         <Text style={styles.postTitle}>{post.title}</Text>
         <Text style={styles.postBody}>{post.body}</Text>
-        <View style={styles.actions}>
-          <Button
-            title={`♥ Like (${post.likes})`}
-            variant="secondary"
-            onPress={likePost}
-          />
+        <View style={styles.statsRow}>
+          <View style={styles.statBadge}>
+            <Text style={styles.statText}>♥ {post.likes} likes</Text>
+          </View>
+          <View style={[styles.statBadge, styles.commentStat]}>
+            <Text style={[styles.statText, styles.commentStatText]}>💬 {post.comments.length} comments</Text>
+          </View>
         </View>
+        <TouchableOpacity style={styles.likeButton} onPress={likePost}>
+          <Text style={styles.likeButtonText}>♥  Like this post</Text>
+        </TouchableOpacity>
       </Card>
 
-      <View style={styles.commentsSection}>
-        <Text style={styles.sectionTitle}>Comments ({post.comments.length})</Text>
-        
+      {/* Comments Section */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Comments</Text>
+        {post.comments.length === 0 && (
+          <Text style={styles.emptyComments}>No comments yet. Be the first!</Text>
+        )}
         {post.comments.map((comment) => (
           <Card key={comment.id} style={styles.commentCard}>
             <Text style={styles.commentName}>{comment.name}</Text>
+            <Text style={styles.commentEmail}>{comment.email}</Text>
             <Text style={styles.commentBody}>{comment.body}</Text>
           </Card>
         ))}
-
-        <Card style={styles.addCommentCard}>
-          <TextInput
-            style={styles.input}
-            placeholder="Add a comment..."
-            value={commentText}
-            onChangeText={setCommentText}
-            multiline
-          />
-          <Button
-            title="Post Comment"
-            onPress={handleAddComment}
-            disabled={!commentText.trim()}
-          />
-        </Card>
       </View>
+
+      {/* Add Comment */}
+      <Card style={styles.addCommentCard}>
+        <Text style={styles.addCommentLabel}>Add a comment</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Share your thoughts…"
+          placeholderTextColor="#AEAEB2"
+          value={commentText}
+          onChangeText={setCommentText}
+          multiline
+        />
+        <TouchableOpacity
+          style={[styles.postBtn, !commentText.trim() && styles.postBtnDisabled]}
+          onPress={handleAddComment}
+          disabled={!commentText.trim()}
+        >
+          <Text style={styles.postBtnText}>Post Comment</Text>
+        </TouchableOpacity>
+      </Card>
     </ScrollView>
   );
 };
@@ -92,58 +111,174 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F2F2F7',
   },
+  content: {
+    padding: 16,
+    paddingBottom: 40,
+  },
   center: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    padding: 24,
+    backgroundColor: '#F2F2F7',
+  },
+  loadingText: {
+    marginTop: 12,
+    color: '#8E8E93',
+    fontSize: 15,
+  },
+  errorEmoji: {
+    fontSize: 48,
+    marginBottom: 16,
+  },
+  errorTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#1C1C1E',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  retryBtn: {
+    backgroundColor: '#007AFF',
+    paddingHorizontal: 28,
+    paddingVertical: 12,
+    borderRadius: 12,
+  },
+  retryText: {
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: 16,
   },
   postCard: {
-    margin: 16,
+    marginBottom: 20,
   },
   postTitle: {
     fontSize: 22,
-    fontWeight: 'bold',
-    marginBottom: 12,
+    fontWeight: '800',
+    color: '#1C1C1E',
+    marginBottom: 14,
+    lineHeight: 30,
+    letterSpacing: -0.3,
+    textTransform: 'capitalize',
   },
   postBody: {
     fontSize: 16,
-    lineHeight: 24,
-    color: '#333',
+    lineHeight: 26,
+    color: '#3C3C43',
+    marginBottom: 20,
   },
-  actions: {
-    marginTop: 16,
+  statsRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 16,
   },
-  commentsSection: {
-    padding: 16,
+  statBadge: {
+    backgroundColor: '#FFE5E5',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 10,
   },
-  sectionTitle: {
-    fontSize: 18,
+  commentStat: {
+    backgroundColor: '#E5F3FF',
+  },
+  statText: {
+    color: '#FF3B30',
     fontWeight: '600',
-    marginBottom: 12,
+    fontSize: 14,
   },
-  commentCard: {
+  commentStatText: {
+    color: '#007AFF',
+  },
+  likeButton: {
+    backgroundColor: '#FF3B30',
+    borderRadius: 14,
+    paddingVertical: 14,
+    alignItems: 'center',
+    shadowColor: '#FF3B30',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.35,
+    shadowRadius: 10,
+    elevation: 5,
+  },
+  likeButtonText: {
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: 16,
+  },
+  section: {
     marginBottom: 8,
   },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#1C1C1E',
+    marginBottom: 12,
+  },
+  emptyComments: {
+    color: '#8E8E93',
+    fontSize: 15,
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  commentCard: {
+    marginBottom: 12,
+  },
   commentName: {
-    fontWeight: '600',
-    marginBottom: 4,
+    fontWeight: '700',
+    color: '#1C1C1E',
+    fontSize: 15,
+    marginBottom: 2,
+    textTransform: 'capitalize',
+  },
+  commentEmail: {
+    fontSize: 12,
+    color: '#8E8E93',
+    marginBottom: 8,
   },
   commentBody: {
-    color: '#666',
+    color: '#3C3C43',
+    lineHeight: 22,
   },
   addCommentCard: {
-    marginTop: 16,
+    marginTop: 8,
+  },
+  addCommentLabel: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#1C1C1E',
+    marginBottom: 12,
   },
   input: {
     backgroundColor: '#F2F2F7',
-    padding: 12,
-    borderRadius: 8,
-    minHeight: 80,
+    borderRadius: 12,
+    padding: 14,
+    minHeight: 90,
     marginBottom: 12,
     textAlignVertical: 'top',
+    fontSize: 15,
+    color: '#1C1C1E',
+    borderWidth: 1.5,
+    borderColor: '#E5E5EA',
   },
-  error: {
-    color: '#FF3B30',
-    marginBottom: 16,
+  postBtn: {
+    backgroundColor: '#007AFF',
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: 'center',
+    shadowColor: '#007AFF',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  postBtnDisabled: {
+    backgroundColor: '#C7C7CC',
+    shadowOpacity: 0,
+    elevation: 0,
+  },
+  postBtnText: {
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: 16,
   },
 });
