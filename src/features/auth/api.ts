@@ -25,7 +25,10 @@ export const registerWithEmail = async (email: string, password: string): Promis
 export const loginWithGoogle = async (): Promise<User> => {
   try {
     await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
-  const { idToken }: any = await GoogleSignin.signIn();
+  const result: any = await GoogleSignin.signIn();
+  console.log('Google Sign-In result:', result);
+  const idToken = result.data?.idToken || result.idToken;
+  if (!idToken) throw new Error('No idToken received from Google');
   const googleCredential = auth.GoogleAuthProvider.credential(idToken);
   const { user } = await auth().signInWithCredential(googleCredential);
   return mapFirebaseUser(user);

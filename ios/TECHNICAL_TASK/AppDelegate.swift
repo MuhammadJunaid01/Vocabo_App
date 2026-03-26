@@ -24,7 +24,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     window = UIWindow(frame: UIScreen.main.bounds)
 
     factory.startReactNative(
-      withModuleName: "TECHNICAL_TASK",
+      withModuleName: "vocaboapp",
       in: window,
       launchOptions: launchOptions
     )

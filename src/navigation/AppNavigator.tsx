@@ -1,4 +1,3 @@
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React, { useEffect } from 'react';
@@ -18,11 +17,6 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 export const AppNavigator: React.FC = () => {
   const { user, loading } = useAuth();
 
-  useEffect(() => {
-    GoogleSignin.configure({
-      webClientId: '623836619468-4rjp4ssk6nsn77msstom12u0c40ne3gv.apps.googleusercontent.com'
-    });
-  }, []);
 
   if (loading) return null;
 
