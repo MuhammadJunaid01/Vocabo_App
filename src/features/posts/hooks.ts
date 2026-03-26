@@ -1,67 +1,123 @@
+import NetInfo from '@react-native-community/netinfo';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { storage } from '../../core/utils/storage';
 import { Comment, Post } from '../../core/types';
+import { storage } from '../../core/utils/storage';
 import { fetchComments, fetchPosts, PAGE_SIZE } from './api';
 
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
-
-// ─── Paginated Posts Hook (Infinite Scroll) ───────────────────────────────────
+// ─── Paginated Posts Hook (Infinite Scroll + Offline Support) ─────────────────
 export const usePosts = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isOffline, setIsOffline] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const pageRef = useRef(1);
-  const lastFetch = useRef<number>(0);
-  const isFetchingRef = useRef(false); // guard against duplicate calls
+  const isFetchingRef = useRef(false);
 
-  const loadPage = useCallback(async (page: number, isRefresh: boolean) => {
-    if (isFetchingRef.current) return;
-    isFetchingRef.current = true;
-
-    isRefresh ? setLoading(true) : setLoadingMore(true);
-    setError(null);
-
+  // ── Helper: persist all currently loaded posts to AsyncStorage ──────────────
+  const persistToCache = useCallback(async (data: Post[]) => {
     try {
-      const data = await fetchPosts(page);
-      setPosts((prev) => (isRefresh ? data : [...prev, ...data]));
-      lastFetch.current = Date.now();
-      setHasMore(data.length === PAGE_SIZE);
-
-      // Cache only the first page for offline use
-      if (isRefresh) {
-        await storage.setItem(storage.KEYS.POSTS, data);
-      }
-    } catch (err: any) {
-      if (isRefresh) {
-        // Fall back to offline cache on initial load failure
-        const cachedData = await storage.getItem(storage.KEYS.POSTS);
-        if (cachedData) {
-          setPosts(cachedData);
-          setHasMore(false);
-          setError('Working offline. Data may be outdated.');
-        } else {
-          setError(err?.message || 'Failed to load posts');
-        }
-      } else {
-        setError(err?.message || 'Failed to load more posts');
-      }
-    } finally {
-      setLoading(false);
-      setLoadingMore(false);
-      isFetchingRef.current = false;
+      await storage.setItem(storage.KEYS.POSTS, data);
+    } catch {
+      // Cache failures are non-fatal
     }
   }, []);
 
+  // ── Helper: load cached posts from AsyncStorage ─────────────────────────────
+  const loadFromCache = useCallback(async (): Promise<Post[]> => {
+    try {
+      const cached = await storage.getItem(storage.KEYS.POSTS);
+      return cached ?? [];
+    } catch {
+      return [];
+    }
+  }, []);
+
+  // ── Core page loader ────────────────────────────────────────────────────────
+  const loadPage = useCallback(
+    async (page: number, isRefresh: boolean) => {
+      if (isFetchingRef.current) return;
+      isFetchingRef.current = true;
+
+      isRefresh ? setLoading(true) : setLoadingMore(true);
+      setError(null);
+
+      // Check network state first
+      const netState = await NetInfo.fetch();
+      const online = !!netState.isConnected && !!netState.isInternetReachable;
+
+      if (!online) {
+        // ── OFFLINE PATH ──────────────────────────────────────────────────────
+        setIsOffline(true);
+        if (isRefresh) {
+          const cached = await loadFromCache();
+          if (cached.length > 0) {
+            setPosts(cached);
+            setError('You are offline. Showing cached data.');
+          } else {
+            setError('No internet connection and no cached data available.');
+          }
+          setHasMore(false); // no pagination when offline
+        }
+        // Don't try to load more when offline
+      } else {
+        // ── ONLINE PATH ───────────────────────────────────────────────────────
+        setIsOffline(false);
+        try {
+          const data = await fetchPosts(page);
+          setPosts((prev) => {
+            const updated = isRefresh ? data : [...prev, ...data];
+            // Cache the full accumulated list every time
+            persistToCache(updated);
+            return updated;
+          });
+          setHasMore(data.length === PAGE_SIZE);
+        } catch (err: any) {
+          // Network call failed even though we thought we were online
+          if (isRefresh) {
+            const cached = await loadFromCache();
+            if (cached.length > 0) {
+              setPosts(cached);
+              setHasMore(false);
+              setError('Failed to fetch. Showing cached data.');
+            } else {
+              setError(err?.message ?? 'Failed to load posts');
+            }
+          } else {
+            setError(err?.message ?? 'Failed to load more posts');
+          }
+        }
+      }
+
+      setLoading(false);
+      setLoadingMore(false);
+      isFetchingRef.current = false;
+    },
+    [loadFromCache, persistToCache],
+  );
+
+  // ── Mount: show cache instantly, then attempt a live refresh ───────────────
   useEffect(() => {
     const init = async () => {
-      // Show cached data immediately for snappy UX
-      const cachedData = await storage.getItem(storage.KEYS.POSTS);
-      if (cachedData) setPosts(cachedData);
+      const cached = await loadFromCache();
+      if (cached.length > 0) setPosts(cached); // instant display
       await loadPage(1, true);
     };
     init();
+
+    // Subscribe to connectivity changes while the screen is mounted
+    const unsubscribe = NetInfo.addEventListener((state) => {
+      const online = !!state.isConnected && !!state.isInternetReachable;
+      setIsOffline(!online);
+      if (online) {
+        // Came back online — silently refresh page 1
+        pageRef.current = 1;
+        loadPage(1, true);
+      }
+    });
+
+    return unsubscribe; // cleanup listener on unmount
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -72,13 +128,13 @@ export const usePosts = () => {
   }, [loadPage]);
 
   const loadMore = useCallback(() => {
-    if (!hasMore || loadingMore || loading) return;
+    if (!hasMore || loadingMore || loading || isOffline) return;
     const nextPage = pageRef.current + 1;
     pageRef.current = nextPage;
     loadPage(nextPage, false);
-  }, [hasMore, loadingMore, loading, loadPage]);
+  }, [hasMore, loadingMore, loading, isOffline, loadPage]);
 
-  return { posts, loading, loadingMore, error, hasMore, refetch, loadMore };
+  return { posts, loading, loadingMore, error, hasMore, isOffline, refetch, loadMore };
 };
 
 // ─── Single Post Hook ─────────────────────────────────────────────────────────
@@ -91,7 +147,6 @@ export const usePost = (postId: number) => {
     setLoading(true);
     setError(null);
     try {
-      // Fetch the specific page containing this post (posts are id 1-100)
       const pageNumber = Math.ceil(postId / PAGE_SIZE);
       const posts = await fetchPosts(pageNumber);
       const found = posts.find((p) => p.id === postId);

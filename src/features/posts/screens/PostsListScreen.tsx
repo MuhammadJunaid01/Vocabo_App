@@ -17,7 +17,7 @@ import { PostCard } from '../components/PostCard';
 import { usePosts } from '../hooks';
 
 export const PostsListScreen: React.FC = () => {
-  const { posts, loading, loadingMore, error, hasMore, refetch, loadMore } = usePosts();
+  const { posts, loading, loadingMore, error, hasMore, isOffline, refetch, loadMore } = usePosts();
   const { logout, user } = useAuth();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const insets = useSafeAreaInsets();
@@ -94,9 +94,9 @@ export const PostsListScreen: React.FC = () => {
       </View>
 
       {/* Offline Banner */}
-      {error && (
+      {isOffline && (
         <View style={styles.offlineBanner}>
-          <Text style={styles.offlineBannerText}>📡 Working offline – showing cached data</Text>
+          <Text style={styles.offlineBannerText}>📡 No internet – showing cached data</Text>
         </View>
       )}
 
