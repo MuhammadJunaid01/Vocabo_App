@@ -35,7 +35,7 @@ export const PostsListScreen: React.FC = () => {
     [handlePress],
   );
 
-  const keyExtractor = useCallback((item: Post) => item.id.toString(), []);
+  const keyExtractor = useCallback((item: Post, index: number) => item.id.toString() + index, []);
 
   const ListFooterComponent = useCallback(() => {
     if (!loadingMore) return null;

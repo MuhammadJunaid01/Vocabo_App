@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Post } from '../../../core/types';
 import { Card } from '../../../shared/components/Card';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 interface PostCardProps {
   post: Post;
@@ -12,7 +13,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onPress }) => {
   return (
     <TouchableOpacity activeOpacity={0.75} onPress={onPress}>
       <Card style={styles.card}>
-        <Text style={styles.title} numberOfLines={2}>
+        <Text style={styles.title} numberOfLines={1}>
           {post.title}
         </Text>
         <Text style={styles.body} numberOfLines={2}>
@@ -20,10 +21,12 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onPress }) => {
         </Text>
         <View style={styles.footer}>
           <View style={styles.badge}>
-            <Text style={styles.badgeText}>♥ {post.likes}</Text>
+            <Icon name="heart" size={14} color="#FF3B30" />
+            <Text style={styles.badgeText}>{post.likes}</Text>
           </View>
           <View style={[styles.badge, styles.commentBadge]}>
-            <Text style={styles.commentBadgeText}>💬 {post.comments.length}</Text>
+            <Icon name="chatbubble" size={13} color="#007AFF" />
+            <Text style={styles.commentBadgeText}>{post.comments.length}</Text>
           </View>
           <Text style={styles.readMore}>Read more →</Text>
         </View>
@@ -56,10 +59,13 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   badge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
     backgroundColor: '#FFE5E5',
     borderRadius: 8,
     paddingHorizontal: 10,
-    paddingVertical: 4,
+    paddingVertical: 5,
   },
   badgeText: {
     color: '#FF3B30',

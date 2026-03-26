@@ -9,15 +9,17 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { usePost } from '../hooks';
 import { Card } from '../../../shared/components/Card';
+import { useAuth } from '../../auth/hooks';
+import { usePost } from '../hooks';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 export const PostDetailScreen: React.FC = () => {
   const route = useRoute();
   const { postId } = route.params as { postId: number };
   const { post, loading, error, likePost, addComment, refetch } = usePost(postId);
   const [commentText, setCommentText] = useState('');
-
+  const { user } = useAuth();
   if (loading) {
     return (
       <View style={styles.center}>
@@ -42,8 +44,8 @@ export const PostDetailScreen: React.FC = () => {
   const handleAddComment = () => {
     if (!commentText.trim()) return;
     addComment({
-      name: 'You',
-      email: 'anon@example.com',
+      name: user?.displayName || 'You',
+      email: user?.email || 'anon@example.com',
       body: commentText.trim(),
     });
     setCommentText('');
@@ -57,14 +59,17 @@ export const PostDetailScreen: React.FC = () => {
         <Text style={styles.postBody}>{post.body}</Text>
         <View style={styles.statsRow}>
           <View style={styles.statBadge}>
-            <Text style={styles.statText}>♥ {post.likes} likes</Text>
+            <Icon name="heart" size={15} color="#FF3B30" />
+            <Text style={styles.statText}>{post.likes} likes</Text>
           </View>
           <View style={[styles.statBadge, styles.commentStat]}>
-            <Text style={[styles.statText, styles.commentStatText]}>💬 {post.comments.length} comments</Text>
+            <Icon name="chatbubble" size={14} color="#007AFF" />
+            <Text style={[styles.statText, styles.commentStatText]}>{post.comments.length} comments</Text>
           </View>
         </View>
         <TouchableOpacity style={styles.likeButton} onPress={likePost}>
-          <Text style={styles.likeButtonText}>♥  Like this post</Text>
+          <Icon name="heart-outline" size={18} color="#fff" />
+          <Text style={styles.likeButtonText}>Like this post</Text>
         </TouchableOpacity>
       </Card>
 
@@ -173,6 +178,9 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   statBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
     backgroundColor: '#FFE5E5',
     paddingHorizontal: 12,
     paddingVertical: 6,
@@ -190,6 +198,9 @@ const styles = StyleSheet.create({
     color: '#007AFF',
   },
   likeButton: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 8,
     backgroundColor: '#FF3B30',
     borderRadius: 14,
     paddingVertical: 14,
